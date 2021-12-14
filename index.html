@@ -1,26 +1,467 @@
+<!DOCTYPE html>
 <html>
 <head>
-<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <meta http-equiv="cache-control" content="no-cache">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
+    <title id='pagetitle'></title>
+    <style>body{font-family:"Sukhumvit Set",Roboto,HelveticaNeue,Arial}h5{font-size:22px;font-weight:100;color:#252525;margin-top:0;margin-bottom:8px}h6{font-size:14px;font-weight:400;line-height:18px;color:#959595;margin-top:0;margin-bottom:8px}.outer{display:table;position:absolute;height:100%;width:100%}.middle{display:table-cell;vertical-align:middle}.inner{margin-left:auto;margin-right:auto;text-align:center;padding:24px;max-width:640px}.btn{width:100px;margin-top:12px;background-color:#4790f6;-moz-border-radius:4px;-webkit-border-radius:4px;border-radius:4px;display:inline-block;cursor:pointer;color:#fff;font-family:Arial;font-size:14px;padding:10px 32px;text-decoration:none;text-shadow:0 1px 2px #2877e6}.btn:active,.btn:hover{background-color:#2877e6}#progress{position:absolute;height:10px;top:0;left:0;background-color:#519af6;}</style>
 <script>
+/**
+ * Common codes
+ * 1. Contants definition
+ * 2. General Utilities
+ */
+var K_PKG_IOS = 'K_PKG_IOS';
+var K_PKG_AND = 'K_PKG_AND';
+var K_DOMAIN  = 'K_DOMAIN';
+var K_APP_URL = 'K_APP_URL';
+var K_URL_AND = 'K_URL_AND';
+var K_APP_NAME = 'K_APP_NAME';
+var K_APP_SLOGAN = 'K_APP_SLOGAN';
+var K_BTN_OPEN = 'K_BTN_OPEN';
+var K_BTN_DOWNLOAD = 'K_BTN_DOWNLOAD';
+var K_GA_ID = 'K_GA_ID';
+
+// Tricky: variable names will be used as raw string literals as the keys in dict, so we need to use raw string to define keys here.
+CONFIGS = {
+	'sg':{'K_PKG_IOS':'959840394', 'K_PKG_AND':'com.shopee.sg', 'K_DOMAIN':'shopee.sg',      'K_APP_URL':'shopeesg://', 'K_URL_AND':'/launchapp', 'K_APP_NAME':'Shopee', 'K_APP_SLOGAN':'', 'K_BTN_OPEN':'Open', 'K_BTN_DOWNLOAD':'Download App', 'K_GA_ID':'UA-61921742-7'},
+	'my':{'K_PKG_IOS':'959841113', 'K_PKG_AND':'com.shopee.my', 'K_DOMAIN':'shopee.com.my',  'K_APP_URL':'shopeemy://', 'K_URL_AND':'/launchapp', 'K_APP_NAME':'Shopee', 'K_APP_SLOGAN':'', 'K_BTN_OPEN':'Open', 'K_BTN_DOWNLOAD':'Download App', 'K_GA_ID':'UA-61915055-6'},
+	'th':{'K_PKG_IOS':'959841453', 'K_PKG_AND':'com.shopee.th', 'K_DOMAIN':'shopee.co.th',   'K_APP_URL':'shopeeth://', 'K_URL_AND':'/launchapp', 'K_APP_NAME':'ช้อปปี้', 'K_APP_SLOGAN':'', 'K_BTN_OPEN':'เปิดแอป', 'K_BTN_DOWNLOAD':'ดาวน์โหลดแอป', 'K_GA_ID':'UA-61914165-6'},
+	'vn':{'K_PKG_IOS':'959841449', 'K_PKG_AND':'com.shopee.vn', 'K_DOMAIN':'shopee.vn',      'K_APP_URL':'shopeevn://', 'K_URL_AND':'/launchapp', 'K_APP_NAME':'Shopee', 'K_APP_SLOGAN':'', 'K_BTN_OPEN':'Mở', 'K_BTN_DOWNLOAD':'Tải ứng dụng', 'K_GA_ID':'UA-61914164-6'},
+	'ph':{'K_PKG_IOS':'959841854', 'K_PKG_AND':'com.shopee.ph', 'K_DOMAIN':'shopee.ph',      'K_APP_URL':'shopeeph://', 'K_URL_AND':'/launchapp', 'K_APP_NAME':'Shopee', 'K_APP_SLOGAN':'', 'K_BTN_OPEN':'Open', 'K_BTN_DOWNLOAD':'Download App', 'K_GA_ID':'UA-61918643-6'},
+	'tw':{'K_PKG_IOS':'959841107', 'K_PKG_AND':'com.shopee.tw', 'K_DOMAIN':'shopee.tw',      'K_APP_URL':'shopeetw://', 'K_URL_AND':'/launchapp', 'K_APP_NAME':'蝦皮購物', 'K_APP_SLOGAN':'', 'K_BTN_OPEN':'打開App', 'K_BTN_DOWNLOAD':'下載蝦皮購物', 'K_GA_ID':'UA-61915057-6'},
+	'xx':{'K_PKG_IOS':'959841107', 'K_PKG_AND':'com.shopee.xx', 'K_DOMAIN':'shopee.xx',         'K_APP_URL':'shopeexx://', 'K_URL_AND':'/launchapp', 'K_APP_NAME':'Shopee', 'K_APP_SLOGAN':'', 'K_BTN_OPEN':'Buka', 'K_BTN_DOWNLOAD':'下載蝦皮購物', 'K_GA_ID':'UA-61915057-6'},
+	'id':{'K_PKG_IOS':'959841443', 'K_PKG_AND':'com.shopee.id', 'K_DOMAIN':'shopee.co.id',   'K_APP_URL':'shopeeid://', 'K_URL_AND':'/launchapp', 'K_APP_NAME':'Shopee', 'K_APP_SLOGAN':'', 'K_BTN_OPEN':'Buka', 'K_BTN_DOWNLOAD':'Download Aplikasi', 'K_GA_ID':'UA-61904553-8'},
+	'ir':{'K_PKG_IOS':'',          'K_PKG_AND':'com.shopee.ir', 'K_DOMAIN':'shopee.co.ir',   'K_APP_URL':'shopeeir://', 'K_URL_AND':'/launchapp', 'K_APP_NAME':'Shopee IR', 'K_APP_SLOGAN':'', 'K_BTN_OPEN':'Open', 'K_BTN_DOWNLOAD':'Download App', 'K_GA_ID':'UA-67367550-1'},
+	'hk':{'K_PKG_IOS':'',          'K_PKG_AND':'com.shopee.intl', 'K_DOMAIN':'shopee.hk',    'K_APP_URL':'shopeeintl://', 'K_URL_AND':'/launchapp', 'K_APP_NAME':'Shopee', 'K_APP_SLOGAN':'', 'K_BTN_OPEN':'Open', 'K_BTN_DOWNLOAD':'Download App', 'K_GA_ID':''},
+	'mm':{'K_PKG_IOS':'',          'K_PKG_AND':'com.shopee.intl', 'K_DOMAIN':'shopee.com.mm','K_APP_URL':'shopeeintl://', 'K_URL_AND':'/launchapp', 'K_APP_NAME':'Shopee', 'K_APP_SLOGAN':'', 'K_BTN_OPEN':'Open', 'K_BTN_DOWNLOAD':'Download App', 'K_GA_ID':''},
+	'br':{'K_PKG_IOS':'1481812175', 'K_PKG_AND':'com.shopee.br', 'K_DOMAIN':'shopee.com.br',      'K_APP_URL':'shopeebr://', 'K_URL_AND':'/launchapp', 'K_APP_NAME':'Shopee', 'K_APP_SLOGAN':'', 'K_BTN_OPEN':'Abrir', 'K_BTN_DOWNLOAD':'Baixar aplicativo', 'K_GA_ID':''},
+};
+
+var cur_local = window.location.hostname.substr(-2);
+var config = CONFIGS[cur_local];
+if(config == undefined) {
+	window.location = 'http://shopee.com';
+}
+
+window['GoogleAnalyticsObject'] = 'ga';
+window['ga'] = window['ga'] || function() {
+	(window['ga'].q = window['ga'].q || []).push(arguments)
+};
+<!-- Google Tag Manager -->
+(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js',country:cur_local});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-WJZQSJF');
+<!-- End Google Tag Manager -->
+var _gaq = _gaq || [];
+
+function paramStringToDict(param) {
+    var ret = {};
+    if(!param || param.length < 3) {
+        return ret;
+    }
+    q = param.split('&');
+    for(var i=0; i<q.length; i++) {
+        var pair = q[i].split('=');
+        ret[pair[0]] = decodeURIComponent(pair[1]);
+    }
+    return ret;
+}
+
+function queryStringToDict()
+{
+	var ret = {};
+	var q = window.location.search;
+	if(!q || q.length < 3) return ret;
+	q = q.substr(1).split('&');
+	for(var i=0; i<q.length; i++) {
+		var pair = q[i].split('=');
+		ret[pair[0]] = decodeURIComponent(pair[1]);
+	}
+	return ret;
+}
+
+if (!String.prototype.endsWith) {
+  String.prototype.endsWith = function(searchString, position) {
+      var subjectString = this.toString();
+      if (typeof position !== 'number' || !isFinite(position) || Math.floor(position) !== position || position > subjectString.length) {
+        position = subjectString.length;
+      }
+      position -= searchString.length;
+      var lastIndex = subjectString.indexOf(searchString, position);
+      return lastIndex !== -1 && lastIndex === position;
+  };
+}
+
+var DOMAIN_WHITE_LIST = ['shp.ee']; //'sgiz.mobi', 'surveygizmo.com', 'www.surveygizmo.com', 'goo.gl', // <-- disabled third party ones.
+function sanitizeRedir(redir) {
+    // redir is not specified
+    if (!redir) {
+        return redir;
+    }
+    var frag = document.createElement('A');
+    frag.href = redir;
+    var hostname = frag.hostname;
+
+    if (hostname) {
+        // whitelisted host name
+        if (DOMAIN_WHITE_LIST.indexOf(hostname) !== -1) {
+            return redir;
+        }
+        // hostname is current root domain
+        if (hostname === config[K_DOMAIN]) {
+            return redir;
+        }
+        // hostname is not a subdomain of current root domain
+        if (hostname.endsWith('.' + config[K_DOMAIN])) {
+            return redir;
+        }
+    }
+
+    return '#';
+}
+
+function getHash() {
+	var hash = location.hash;
+	if(hash != null && hash != "") {
+		return hash.substr(1);
+	}
+}
+
+var GA_CAT_MOBILE = 'mobile';
+var GA_CAT_PC = 'pc';
+var SKIP_PARAMS_FOR_APPSFLYER = /redir|dlOnly|instant_redir|fallback_to_store|ga_.*|og_.*/;
+var PARAMS = queryStringToDict();
+var REDIR = sanitizeRedir(PARAMS['redir']);
+var INSTANT_REDIR = sanitizeRedir(PARAMS['instant_redir']);
+var FALLBACK_TO_STORE = sanitizeRedir(PARAMS['fallback_to_store']);
+var DOWNLOAD_ONLY = PARAMS['dlOnly'];
+var DEEP_LINK = PARAMS['deep_link'];
+
+function isShopeeApp() {
+	if(window._isShopeeApp_ == undefined)
+		window._isShopeeApp_ = navigator.userAgent.indexOf('Shopee') >= 0;
+	return window._isShopeeApp_;
+}
+
+function isApple() {
+	return navigator.userAgent.indexOf('iPhone') > 0 || navigator.userAgent.indexOf('iPad') > 0;
+}
+
+function isAndroid() {
+	return navigator.userAgent.indexOf('Android') > 0;
+}
+
+function isWeChat() {
+	return navigator.userAgent.indexOf('MicroMessenger/') > 0;
+}
+
+function isGasApp() {
+	return navigator.userAgent.indexOf('GarenaGas/') >= 0;
+}
+
+function isBrowser() {
+	var ua = navigator.userAgent;
+	if (isApple()) {
+		return ua.indexOf('Safari/') > 0;
+	}
+	return ua.indexOf('Chrome/') > 0 && ua.indexOf('Chrome/30.0') < 0;
+}
+
+function isPageHidden() {
+    return document["hidden"] || document["mozHidden"] || document["webkitHidden"] || document["msHidden"];
+}
+
+function app_ga() {
+    if(isShopeeApp()) {
+    	return;
+    }
+
+	var ga_action = PARAMS['ga_action'];
+	var ga_label = PARAMS['ga_label'];
+	if(ga_action || ga_label) {
+    	var ga_category = isApple()||isAndroid() ? GA_CAT_MOBILE : GA_CAT_PC;
+		ga('send', 'event', ga_category, ga_action, ga_label);
+	}
+}
+
+function appendParams(appUrl) {
+    var p = [];
+    for(var key in PARAMS) {
+    	if(PARAMS.hasOwnProperty(key) && !key.match(SKIP_PARAMS_FOR_APPSFLYER)) {
+    		p.push(key + '=' + encodeURIComponent(PARAMS[key]));
+    	}
+    }
+    if(p.length > 0) {
+    	appUrl += appUrl.indexOf('?')>-1 ? '&' : '?';
+        appUrl += p.join('&');
+    }
+	return appUrl;
+}
 
 
-var fallbackToStore = function() {
-  window.location.replace('https://smexpert.com.my/download');
-};
-var openApp = function() {
-  window.location.assign('smexpertapp://DealsDetail/10197');
-};
-var triggerAppOpen = function() {
-  openApp();
-  setTimeout(fallbackToStore, 700);
-};
+/**
+ * Following codes are related to business logic
+ */
 
-triggerAppOpen();
+function getStoreUrl() {
+	var appUrl = 'http://app.appsflyer.com/{id}';
+	if(isApple()) {
+		appUrl = appUrl.replace('{id}', 'id' + config[K_PKG_IOS]);
+		if(isWeChat()) {
+			appUrl = 'http://mp.weixin.qq.com/mp/redirect?url=' + encodeURIComponent(appUrl);
+		}
+	} else if(isAndroid()) {
+		// Gas app doesn't support market://.
+		if(isGasApp()) {
+			appUrl = 'http://play.google.com/store/apps/details?id=' + config[K_PKG_AND];
+		} else {
+			appUrl = appUrl.replace('{id}', config[K_PKG_AND]);
+		}
+	} else {
+		appUrl = 'http://' + config[K_DOMAIN];
+	}
+
+ 	return appendParams(appUrl);
+}
+
+function getAutoOpenUrl() {
+	var hash = DEEP_LINK ? DEEP_LINK : getHash();
+
+    // For android shopee app, cannot open deeplink url directly, it will show url is invalid.
+    // Probably app will fix this in future
+	if(isAndroid() && isShopeeApp()) {
+        url = location.origin;
+	    if(hash != null) {
+		    url += "/bridge_cmd/?cmd=super_jump&destination=" + hash.split("?")[0];
+		    if(hash.startsWith("reactPath")) {
+		        reactPathParams = paramStringToDict(hash.split("?")[1]);
+		        if("navigate_url" in reactPathParams) {
+		            url = reactPathParams["navigate_url"];
+		        }
+		    }
+		}
+		return url;
+	}
+	return config[K_APP_URL] + (hash!=null ? hash : "");
+}
+
+function fallback(isFromClick) {
+    // Open redir page no matter from click or auto open.
+    if(REDIR) {
+        window.location = REDIR;
+        return;
+    }
+    // Open store only from click.
+    isFromClick && (window.location=getStoreUrl());
+}
+
+function showProgress() {
+    var initialTimestamp;
+    var duration = 3000;
+    var animate = function(ts) {
+        if (!initialTimestamp) {
+            initialTimestamp = ts;
+        }
+        var progress = (ts - initialTimestamp) / duration * 100;
+        var width = 0;
+        if (progress < 10) {
+            width = progress * 5;
+        } else {
+            width = 50 + (progress - 10) / 90 * 50;
+        }
+        document.getElementById('progress').style.width = width + '%';
+        if (progress < 100) {
+            window.requestAnimationFrame(animate);
+        }
+    }
+    window.requestAnimationFrame(animate);
+}
+
+// Try instant_redir and fallback_to_store first, otherwise fallback()
+function optionalFallback(redirectTimeout, isFromClick, fallbackTimeout) {
+
+    // https://jira.shopee.io/browse/SPGRO-2214
+    // Disable fallback if it's in Android, and comes from games.shopee.*
+    // If we don't disable fallback, it'll cause bug as in video at the ticket.
+    var a = document.createElement("a");
+    a.href = REDIR;
+    if (isAndroid() && a.hostname.indexOf("games") >= 0) {
+        return;
+    }
+
+    if(INSTANT_REDIR || FALLBACK_TO_STORE) {
+        if(INSTANT_REDIR) {
+            btnOpen.remove();
+            btnDownload.remove();
+        }
+
+        var redir = INSTANT_REDIR ? INSTANT_REDIR : getStoreUrl();
+        if(!isPageHidden()) {
+            if(isApple()) {
+                showProgress();
+            }
+            if(redirectTimeout > 0) {
+                setTimeout(function() {
+                	!isPageHidden() && (window.location=redir);
+                }, redirectTimeout);
+            } else {
+                window.location = redir;
+            }
+        } else {
+            document.addEventListener("visibilitychange", function() {
+                !isPageHidden() && (window.location=redir);
+            }, false);
+        }
+    } else {
+        //Always open store/fallback URL no matter what (because we won't know if the above line succeeds).
+        //Note that if app is successfully opened, Chrome will close current window and the store won't be opened, which is good.
+        setTimeout(function() {
+            fallback(isFromClick);
+        }, fallbackTimeout);
+    }
+}
+
+function getAndroidDelayTimeForCloseWindow(ua) {
+	// Note: new window will be auto-closed by browser/chrome if app is started (experiment result).
+	// So we can use that to decide whether to do onFail().
+	// The error message of native browser will still be shown to the user for about 0.5 seconds.
+	// But this is the best we can achieve.
+	// Special handling for different devices:
+	// 1. Samsung DUOS: Chrome on it needs 1 second timeout. Built-in browser works fine with 500, but we just force for both.
+	// 2. XiaoMi: 0.8s.
+	// 3. Samsung Note + Chrome needs 5s to open app
+	if(ua.indexOf('SM-G130H') >= 0) {
+		return 1000;
+	}
+	if(ua.indexOf('XiaoMi') >= 0) {
+		return 800;
+	}
+	if(ua.indexOf('SM-N9005') >= 0 && ua.indexOf('Chrome/39') >= 0) {
+		return 5000;
+	}
+	return 500;
+}
+
+function checkAndCloseWindow(wnd) {
+	wnd.close();
+	// Keep trying until closed. This is for Android 5.0.
+	if(wnd.window) {
+		setTimeout(function() {
+			checkAndCloseWindow(wnd);
+		}, 50);
+	}
+}
+
+function openAndroid(url, isFromClick) {
+	var ua = navigator.userAgent;
+	// 1. New Chrome and MiuiBrowser: cannot open App URL in new window any more.
+	//    But they support graceful failure when app is not installed. So we can (and have to) safely do this.
+	if(ua.match(/Chrome\/([4-9]\d+|\d{3,})/) || ua.indexOf('MiuiBrowser/') > 0) {
+        window.location = url;
+        optionalFallback(3000, isFromClick, 3000);
+        return;
+	}
+
+	// 2. Old chrome and Android Browser: can open app in new window, and don't fail gracefully,
+	//    So the following code avoids the non-graceful failure when app is not installed.
+    //    Note: This may not work if this function isn't triggered by user action and popup is blocked in browser.
+	var newWindow = window.open(url);
+
+	setTimeout(function() {
+        // Note: Must check newWindow availability because it could be null when opened from other apps such as FB or BeeTalk etc.
+		if(newWindow && newWindow.window){
+			checkAndCloseWindow(newWindow);
+		}
+        optionalFallback(0, isFromClick, 3000);
+	}, getAndroidDelayTimeForCloseWindow(ua));
+}
+
+function autoOpen() {
+	var autoOpenUrl = getAutoOpenUrl();
+	if(isApple()) {
+		// Set timeout because iOS9.2 would cancel deep link if we change href before user interaction to the "Open/Cancel" dialog.
+		// 1. User-triggered action: 3 seconds to make it respond faster (but not too fast)
+		// 2. Auto-triggered action: 5 seconds
+		var userActionTimeout = 3000;
+		var autoActionTimeout = 5000;
+
+		btnOpen.href = autoOpenUrl;
+		btnOpen.onclick = function(e) {
+			setTimeout(function(){fallback(true);}, userActionTimeout);
+		};
+		window.location = autoOpenUrl;
+        optionalFallback(userActionTimeout, false, autoActionTimeout);
+	} else if(isAndroid() && isShopeeApp()) {
+		location.replace(autoOpenUrl);
+	} else if(isAndroid() && !isGasApp()) {
+		btnOpen.onclick = function(){openAndroid(autoOpenUrl, true);};
+		openAndroid(autoOpenUrl, false);
+	} else {
+        btnOpen.onclick = function(){fallback(true);};
+        fallback(true);
+	}
+}
 
 </script>
+
 </head>
+
 <body>
+	<!-- Google Tag Manager (noscript) -->
+	<noscript>
+		<iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WJZQSJF"
+			height="0" width="0" style="display: none; visibility: hidden"></iframe>
+	</noscript>
+	<!-- End Google Tag Manager (noscript) -->
+    <div id="progress"></div>
+
+	<div class="outer">
+		<div class="middle">
+			<div class="inner">
+				<img id='shopee_logo' src='/web_static/html/logo.png'>
+				<h5 style="display: none;" id='apptitle'></h5>
+				<h6 id='appslogan'></h6>
+				<div>
+					<a href="javascript:void(0);" class="btn btnOpen" id="btnOpen"></a>
+				</div>
+				<div>
+					<a href="javascript:void(0);" class="btn btnDownload"
+						id="btnDownload"></a>
+				</div>
+			</div>
+
+		</div>
+	</div>
+
+	<script>
+    if(isShopeeApp() && REDIR) {
+        window.location.replace(REDIR);
+    } else {
+        app_ga();
+
+        pagetitle.textContent = apptitle.textContent = config[K_APP_NAME];
+        appslogan.textContent = config[K_APP_SLOGAN];
+        btnOpen.textContent = config[K_BTN_OPEN];
+        btnDownload.textContent = config[K_BTN_DOWNLOAD];
+        btnDownload.href = getStoreUrl();
+        if(DOWNLOAD_ONLY) {
+            btnOpen.style.display = "none";
+        } else {
+            autoOpen();
+        }
+    }
+    setTimeout(function () {
+        if (cur_local === "tw") {
+            document.getElementById('shopee_logo').src = '/web_static/html/logo_tw.png';
+        }
+    }, 100);
+	</script>
 
 </body>
-
 </html>
+
