@@ -43,7 +43,7 @@ CONFIGS = {
 var cur_local = window.location.hostname.substr(-2);
 var config = CONFIGS[cur_local];
 if(config == undefined) {
-	window.location = 'http://shopee.com';
+	//window.location = 'http://shopee.com';
 }
 
 window['GoogleAnalyticsObject'] = 'ga';
@@ -144,7 +144,8 @@ var DEEP_LINK = PARAMS['deep_link'];
 
 function isShopeeApp() {
 	if(window._isShopeeApp_ == undefined)
-		window._isShopeeApp_ = navigator.userAgent.indexOf('Shopee') >= 0;
+		window._isShopeeApp_ = navigator.userAgent.indexOf('SMEXpert') >= 0;
+		alert(window._isShopeeApp_)
 	return window._isShopeeApp_;
 }
 
