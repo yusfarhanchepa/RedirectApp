@@ -1,0 +1,10 @@
+{
+  "applinks": {
+      "apps": [],
+      "details": [{
+          "appID": "TP6TDMES2R.com.bankislam.smexpert",
+          "paths": ["*"]
+          }
+      ]
+  }
+}
