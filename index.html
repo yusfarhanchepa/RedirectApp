@@ -12,7 +12,7 @@ if (navigator.userAgent.match(/(iPhone|iPod|iPad);?/i) ||
     is_android = true;
   }
   if (location.hash) {
-    var app_loc = "smexpertapp://" + location.hash.substring(2);
+    var app_loc = "smexpertapp://" + location.hash.substring(1);
     if (is_android) {
       var w = null;
       try {
