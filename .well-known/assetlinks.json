@@ -1,5 +1,9 @@
-[{
+{
   "relation": ["delegate_permission/common.handle_all_urls"],
-  "target" : { "namespace": "android_app", "package_name": "com.bankislam.smexpert",
-               "sha256_cert_fingerprints": ["B2:1A:4B:D4:CE:BD:0D:A5:A3:8D:22:1F:53:28:0F:D6:A7:8A:AB:67:70:08:5D:A4:99:E9:B1:FD:A9:9B:87:7D"] }
-}]
+  "target": {
+    "namespace": "android_app",
+    "package_name": "com.bankislam.smexpert",
+    "sha256_cert_fingerprints":
+      ["EE:61:0C:79:6D:B3:27:96:2B:80:C5:A8:AB:D5:97:57:DE:23:B0:F1:B7:8B:F2:CC:3D:76:C0:34:CD:2B:D3:00"]
+   }
+}
